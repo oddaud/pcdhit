@@ -97,9 +97,9 @@ def call_cdhit(cdhit_exe, fin, fout, threshold):
     import subprocess
     command = '%s -i %s -o %s -c %s' % (cdhit_exe, fin.name, fout.name,
                                         threshold)
-    returncode = subprocess.Popen(command, shell=True).wait()
-    if returncode != 0:
-        raise CdhitCommandError
+    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    return
 
 
 @timeit
@@ -137,9 +137,7 @@ def filter(records, threshold):
 
     # open tmp files
     with opentf() as fin, opentf() as fout:
-
         print_input_fasta(records, fin)
-
         call_cdhit(cdhit_exe, fin, fout, threshold)
 
         for rec in lilbio.parse(fout, fmt='fasta'):
